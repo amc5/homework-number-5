@@ -88,7 +88,7 @@ library(sciplot)
   for(i in 1:1000){ #tells the bootstrap to sample 1000 times
   samp <- d[sample(nrow(d), replace=TRUE),] 
   m <- lm(log_hr~log_fbm, samp) #fits bootstrapped data into a linear model
-  s <- rbind(s, coef(m)) #creats data fraome of the bootstrapepd coefficients
+  s <- rbind(samp, coef(m)) #creats data fraome of the bootstrapepd coefficients
   }
 
 head(s)
@@ -103,3 +103,31 @@ quantile(s[,2], c(0.025, 0.975), na.rm = TRUE) #sets the confidence intervals
 ```
 
 ##The standard errors for the bootstrapped data are slightly lower than the original standard errors from the linear model. The confidence intervals are also similar, to the original model. The 95%Cis for the bootsrapped are slightly lower, but generally comprable I would say.
+
+
+
+###extra credit function, submitted late (sorry, at 1:30 on Monday)
+```{r}
+funk <- function(dt){
+  s <- NULL #sets s as an emply variable
+  yintercept <- c()
+  slope <- c()
+  SE1 <- c()
+  SE2 <- c() #creates empty vectors that will be filled in at the end
+  m <- rep(0,1000) 
+    for(i in 1:1000){ #tells the bootstrap to sample 1000 times
+    samp <- d[sample(nrow(d), replace=TRUE),]  #random bootstrap sampling
+    m <- lm(log_hr~log_fbm, samp) #fits bootstrapped data into a linear model
+   s <- rbind(s, coef(m)) #creats data fraome of the bootstrapepd coefficients
+     SE1 <- sd(s[,1])
+     SE2 <- sd(s[,2])
+    }
+     yintercept <- as.numeric(quantile(s[,1], c(0.025, 0.975), na.rm = TRUE)) #creates vector of beta coefficient
+     slope <- as.numeric(quantile(s[,2], c(0.025, 0.975), na.rm = TRUE)) #creates vector of beta coefficient
+    c <- cbind(s, yintercept, slope, SE1, SE2)
+    return(as.data.frame(c))
+}
+
+f <- funk(d)
+head(f)
+```
